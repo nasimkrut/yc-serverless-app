@@ -2,7 +2,6 @@ using System.Data;
 using Ydb.Sdk.Ado;
 
 var builder = WebApplication.CreateBuilder(args);
-
 builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
         policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
@@ -13,7 +12,6 @@ app.UseCors();
 var instanceId = Guid.NewGuid().ToString("N")[..8];
 const string BackendVersion = "v1.0.0";
 
-// YDB_ENDPOINT example: grpcs://ydb.serverless.yandexcloud.net:2135
 var ydbEndpoint = Environment.GetEnvironmentVariable("YDB_ENDPOINT");
 var ydbDatabase = Environment.GetEnvironmentVariable("YDB_DATABASE");
 
@@ -42,21 +40,17 @@ app.MapGet("/api/messages", async () =>
         return Results.Ok(Array.Empty<object>());
 
     var messages = new List<object>();
-
     await using var conn = await db.OpenConnectionAsync();
     await using var cmd = conn.CreateCommand();
     cmd.CommandText = "SELECT id, text, created_at FROM messages ORDER BY created_at DESC LIMIT 50;";
-
     await using var reader = await cmd.ExecuteReaderAsync();
     while (await reader.ReadAsync())
-    {
         messages.Add(new
         {
             id = reader.GetString(0),
             text = reader.GetString(1),
             createdAt = reader.GetDateTime(2).ToString("O")
         });
-    }
 
     return Results.Ok(messages);
 });
@@ -65,12 +59,10 @@ app.MapPost("/api/messages", async (MessageDto dto) =>
 {
     if (string.IsNullOrWhiteSpace(dto.Text))
         return Results.BadRequest(new { error = "Text is required" });
-
     if (db is null)
         return Results.StatusCode(503);
 
     var id = Guid.NewGuid().ToString();
-
     await using var conn = await db.OpenConnectionAsync();
     await using var cmd = conn.CreateCommand();
     cmd.CommandText = """

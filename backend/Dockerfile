@@ -6,8 +6,10 @@ ENV ASPNETCORE_URLS=http://+:8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["GuestbookApi/GuestbookApi.csproj", "GuestbookApi/"]
+COPY ["Ydb.Sdk.Yc.Auth/Ydb.Sdk.Yc.Auth.csproj", "Ydb.Sdk.Yc.Auth/"]
 RUN dotnet restore "GuestbookApi/GuestbookApi.csproj"
 COPY GuestbookApi/ GuestbookApi/
+COPY Ydb.Sdk.Yc.Auth/ Ydb.Sdk.Yc.Auth/
 RUN dotnet publish "GuestbookApi/GuestbookApi.csproj" -c Release -o /app/publish
 
 FROM base AS final
