@@ -73,7 +73,7 @@ app.MapPost("/api/messages", async (MessageDto dto) =>
         """;
     cmd.Parameters.Add(new YdbParameter("$id", DbType.String, id));
     cmd.Parameters.Add(new YdbParameter("$text", DbType.String, dto.Text));
-    cmd.Parameters.Add(new YdbParameter("$created_at", DbType.DateTime, DateTime.UtcNow));
+    cmd.Parameters.Add(new YdbParameter("$created_at", DbType.DateTime2, DateTime.UtcNow));
     await cmd.ExecuteNonQueryAsync();
 
     return Results.Ok(new { id });
